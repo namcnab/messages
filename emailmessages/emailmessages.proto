@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package emailmessages;
+
+option go_package = "github.com/namcnab/messages/emailmessages";
+
+service EmailMessageService {
+    rpc SendEmail(EmailReq) returns (GenericResponse) {}
+}
+  
+// Define the Request message
+message EmailReq {
+  string subject = 1;
+  repeated string recipients = 2;
+  string body = 3;
+  string senderName = 4;
+}
+
+message GenericResponse {
+  bytes messageId = 1;
+  string message = 2;
+}
