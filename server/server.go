@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"io"
+	"log"
 
 	"github.com/google/uuid"
 	emailpb "github.com/namcnab/messages/emailmessages"
@@ -36,4 +38,27 @@ func (s *EmailMessageServer) BroadcastLetter(letter *emailpb.LetterMessage, stre
 
 	return nil
 
+}
+
+func (s *EmailMessageServer) UpdateScribers(stream emailpb.EmailMessageService_UpdateScribersServer) error {
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			log.Println("Stream closed by client")
+			return nil
+		}
+		if err != nil {
+			log.Println("Error receiving message:", err)
+			return err
+		}
+
+		subscribers := req.GetSubscribers()
+
+		for _, subscriber := range subscribers {
+			// Process the received message
+			log.Println("Received message:", subscriber)
+		}
+
+	}
 }

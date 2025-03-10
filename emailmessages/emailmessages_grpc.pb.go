@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	EmailMessageService_SendEmail_FullMethodName       = "/emailmessages.EmailMessageService/SendEmail"
 	EmailMessageService_BroadcastLetter_FullMethodName = "/emailmessages.EmailMessageService/BroadcastLetter"
+	EmailMessageService_UpdateScribers_FullMethodName  = "/emailmessages.EmailMessageService/UpdateScribers"
 )
 
 // EmailMessageServiceClient is the client API for EmailMessageService service.
@@ -29,6 +30,7 @@ const (
 type EmailMessageServiceClient interface {
 	SendEmail(ctx context.Context, in *EmailReq, opts ...grpc.CallOption) (*GenericResponse, error)
 	BroadcastLetter(ctx context.Context, in *LetterMessage, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Broadcast], error)
+	UpdateScribers(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[SubscriberList, GenericResponse], error)
 }
 
 type emailMessageServiceClient struct {
@@ -68,12 +70,26 @@ func (c *emailMessageServiceClient) BroadcastLetter(ctx context.Context, in *Let
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EmailMessageService_BroadcastLetterClient = grpc.ServerStreamingClient[Broadcast]
 
+func (c *emailMessageServiceClient) UpdateScribers(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[SubscriberList, GenericResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &EmailMessageService_ServiceDesc.Streams[1], EmailMessageService_UpdateScribers_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[SubscriberList, GenericResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type EmailMessageService_UpdateScribersClient = grpc.ClientStreamingClient[SubscriberList, GenericResponse]
+
 // EmailMessageServiceServer is the server API for EmailMessageService service.
 // All implementations must embed UnimplementedEmailMessageServiceServer
 // for forward compatibility.
 type EmailMessageServiceServer interface {
 	SendEmail(context.Context, *EmailReq) (*GenericResponse, error)
 	BroadcastLetter(*LetterMessage, grpc.ServerStreamingServer[Broadcast]) error
+	UpdateScribers(grpc.ClientStreamingServer[SubscriberList, GenericResponse]) error
 	mustEmbedUnimplementedEmailMessageServiceServer()
 }
 
@@ -89,6 +105,9 @@ func (UnimplementedEmailMessageServiceServer) SendEmail(context.Context, *EmailR
 }
 func (UnimplementedEmailMessageServiceServer) BroadcastLetter(*LetterMessage, grpc.ServerStreamingServer[Broadcast]) error {
 	return status.Errorf(codes.Unimplemented, "method BroadcastLetter not implemented")
+}
+func (UnimplementedEmailMessageServiceServer) UpdateScribers(grpc.ClientStreamingServer[SubscriberList, GenericResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method UpdateScribers not implemented")
 }
 func (UnimplementedEmailMessageServiceServer) mustEmbedUnimplementedEmailMessageServiceServer() {}
 func (UnimplementedEmailMessageServiceServer) testEmbeddedByValue()                             {}
@@ -140,6 +159,13 @@ func _EmailMessageService_BroadcastLetter_Handler(srv interface{}, stream grpc.S
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EmailMessageService_BroadcastLetterServer = grpc.ServerStreamingServer[Broadcast]
 
+func _EmailMessageService_UpdateScribers_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(EmailMessageServiceServer).UpdateScribers(&grpc.GenericServerStream[SubscriberList, GenericResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type EmailMessageService_UpdateScribersServer = grpc.ClientStreamingServer[SubscriberList, GenericResponse]
+
 // EmailMessageService_ServiceDesc is the grpc.ServiceDesc for EmailMessageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -157,6 +183,11 @@ var EmailMessageService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "BroadcastLetter",
 			Handler:       _EmailMessageService_BroadcastLetter_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "UpdateScribers",
+			Handler:       _EmailMessageService_UpdateScribers_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "emailmessages.proto",
