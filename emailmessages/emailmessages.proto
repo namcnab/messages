@@ -6,6 +6,7 @@ option go_package = "github.com/namcnab/messages/emailmessages";
 
 service EmailMessageService {
     rpc SendEmail(EmailReq) returns (GenericResponse) {}
+    rpc BroadcastLetter(LetterMessage) returns (stream Broadcast) {}
 }
   
 // Define the Request message
@@ -19,4 +20,16 @@ message EmailReq {
 message GenericResponse {
   bytes messageId = 1;
   string message = 2;
+}
+
+message LetterMessage {
+  string sender = 1;
+  string message = 2;
+}
+
+message Broadcast {
+  bytes broadcastId = 1;
+  string sender = 2;
+  string subscriber = 3;
+  string message = 4;
 }
