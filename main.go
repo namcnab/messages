@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/namcnab/messages/emailmessages" // import the generated protobuf code
+	emailpb "github.com/namcnab/messages/emailmessages" // import the generated protobuf code
 	"github.com/namcnab/messages/server"
 	"google.golang.org/grpc"
 )
@@ -24,7 +24,7 @@ func main() {
 	log.Println("Registering server...")
 
 	// register our server struct as a handle for the EmailMessageService rpc calls that come in through grpcServer
-	pb.RegisterEmailMessageServiceServer(grpcServer, &server.EmailMessageServer{})
+	emailpb.RegisterEmailMessageServiceServer(grpcServer, &server.EmailMessageServer{})
 
 	log.Println("Server registered successfully")
 
