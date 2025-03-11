@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "github.com/namcnab/messages/chat";
+
+service ChatMessageService {
+    rpc Chat(stream ClientMessage) returns (stream ServerResponse) {}
+}
+  
+message ClientMessage {
+  string message = 1;
+}
+
+message ServerResponse {
+  bytes messageId = 1;
+  string message = 2;
+}
