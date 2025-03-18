@@ -24,7 +24,7 @@ func main() {
 
 	log.Println("Registering server...")
 
-	// register our server struct as a handle for the EmailMessageService rpc calls that come in through grpcServer
+	// register our server struct as a handle for the EmailMessageService and ChatMessageService rpc calls that come in through grpcServer
 	emailpb.RegisterEmailMessageServiceServer(grpcServer, &server.EmailMessageServer{})
 	chatpb.RegisterChatMessageServiceServer(grpcServer, &server.ChatMessageServer{})
 
