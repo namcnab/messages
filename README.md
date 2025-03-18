@@ -1,4 +1,4 @@
-# Messages APIs
+# Messages gRPC APIs
 The purpose of this project is to provide gRPC examples. Four of the main types of Remote Procedure Calls are implemented. 
 
 ## gRPC Definitions
